@@ -23,7 +23,6 @@
 
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(enlace)}`;
 
-      // Descargar la imagen como Blob para evitar que se abra
       fetch(qrUrl)
         .then(response => response.blob())
         .then(blob => {
@@ -34,11 +33,10 @@
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
-          URL.revokeObjectURL(blobUrl); // Liberar memoria
+          URL.revokeObjectURL(blobUrl);
         })
         .catch(() => alert("❌ Error al generar el código QR."));
     });
   </script>
 </body>
 </html>
-
