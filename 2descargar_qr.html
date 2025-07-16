@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Descargar QR</title>
+</head>
+<body style="text-align: center; font-family: sans-serif; padding: 50px;">
+  <h2>📲 Descargar código QR</h2>
+  <p>Espera 15 segundos antes de poder descargar tu código QR personalizado.</p>
+
+  <!-- Imagen de vista previa -->
+  <div id="previewContainer" style="margin: 20px;">
+    <img id="qrPreview" src="" alt="QR Preview" style="display:none; border:1px solid #ccc; padding:10px;">
+  </div>
+
+  <button id="descargarBtn" style="padding: 10px 20px; font-size: 16px;" disabled>
+    ⏳ Esperando...
+  </button>
+
+  <script>
+    const button = document.getElementById("descargarBtn");
+    const qrImage = document.getElementById("qrPreview");
+    const params = new URLSearchParams(window.location.search);
+    const enlace = params.get("url");
+
+    if (!enlace) {
+      document.body.innerHTML = "<h3>❌ No se proporcionó ninguna URL.</h3>";
+      throw new Error("Sin URL");
+    }
+
+    // Construir URL del QR
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(enlace)}`;
+
+    // Mostrar vista previa
+    qrImage.src = qrUrl;
+    qrImage.style.display = "inline-block";
+
+    // Temporizador
+    let contador = 15;
+    const intervalo = setInterval(() => {
+      button.innerText = `⏳ Espera ${contador--}s...`;
+      if (contador < 0) {
+        clearInterval(intervalo);
+        button.innerText = "⬇️ Descargar QR";
+        button.disabled = false;
+      }
+    }, 1000);
+
+    button.addEventListener("click", () => {
+      fetch(qrUrl)
+        .then(response => response.blob())
+        .then(blob => {
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = blobUrl;
+          a.download = "codigoQR.png";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+        })
+        .catch(() => alert("❌ Error al generar el código QR."));
+    });
+  </script>
+</body>
+</html>
