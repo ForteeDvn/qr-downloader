@@ -7,12 +7,19 @@
 <body style="text-align: center; font-family: sans-serif; padding: 50px;">
   <h2>📲 Descargar código QR</h2>
   <p>Espera 15 segundos antes de poder descargar tu código QR personalizado.</p>
+
+  <!-- Imagen de vista previa -->
+  <div id="previewContainer" style="margin: 20px;">
+    <img id="qrPreview" src="" alt="QR Preview" style="display:none; border:1px solid #ccc; padding:10px;">
+  </div>
+
   <button id="descargarBtn" style="padding: 10px 20px; font-size: 16px;" disabled>
     ⏳ Esperando...
   </button>
 
   <script>
     const button = document.getElementById("descargarBtn");
+    const qrImage = document.getElementById("qrPreview");
     const params = new URLSearchParams(window.location.search);
     const enlace = params.get("url");
 
@@ -21,12 +28,18 @@
       throw new Error("Sin URL");
     }
 
-    // Esperar 15 segundos antes de activar el botón
+    // Construir URL del QR
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(enlace)}`;
+
+    // Mostrar vista previa
+    qrImage.src = qrUrl;
+    qrImage.style.display = "inline-block";
+
+    // Temporizador
     let contador = 15;
     const intervalo = setInterval(() => {
-      contador--;
-      button.innerText = `⏳ Espera ${contador}s...`;
-      if (contador <= 0) {
+      button.innerText = `⏳ Espera ${contador--}s...`;
+      if (contador < 0) {
         clearInterval(intervalo);
         button.innerText = "⬇️ Descargar QR";
         button.disabled = false;
@@ -34,8 +47,6 @@
     }, 1000);
 
     button.addEventListener("click", () => {
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(enlace)}`;
-
       fetch(qrUrl)
         .then(response => response.blob())
         .then(blob => {
