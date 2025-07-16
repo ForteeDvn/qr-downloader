@@ -4,30 +4,39 @@
   <meta charset="UTF-8">
   <title>Descargar QR</title>
 </head>
-<body style="font-family: sans-serif; text-align: center; padding: 50px;">
+<body style="text-align: center; font-family: sans-serif; padding: 50px;">
   <h2>📲 Descargar código QR</h2>
   <p>Haz clic en el botón para descargar tu código QR personalizado.</p>
-  <button id="descargarBtn" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+  <button id="descargarBtn" style="padding: 10px 20px; font-size: 16px;">
     ⬇️ Descargar QR
   </button>
 
   <script>
-    document.getElementById("descargarBtn").addEventListener("click", function() {
+    document.getElementById("descargarBtn").addEventListener("click", function () {
       const params = new URLSearchParams(window.location.search);
       const enlace = params.get("url");
 
       if (!enlace) {
-        alert("❌ No se proporcionó ninguna URL válida.");
+        alert("❌ No se proporcionó ninguna URL.");
         return;
       }
 
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(enlace)}`;
-      const link = document.createElement("a");
-      link.href = qrUrl;
-      link.download = "codigoQR.png";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+
+      // Descargar la imagen como Blob para evitar que se abra
+      fetch(qrUrl)
+        .then(response => response.blob())
+        .then(blob => {
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = blobUrl;
+          a.download = "codigoQR.png";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl); // Liberar memoria
+        })
+        .catch(() => alert("❌ Error al generar el código QR."));
     });
   </script>
 </body>
