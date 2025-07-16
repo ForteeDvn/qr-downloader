@@ -6,21 +6,34 @@
 </head>
 <body style="text-align: center; font-family: sans-serif; padding: 50px;">
   <h2>📲 Descargar código QR</h2>
-  <p>Haz clic en el botón para descargar tu código QR personalizado.</p>
-  <button id="descargarBtn" style="padding: 10px 20px; font-size: 16px;">
-    ⬇️ Descargar QR
+  <p>Espera 15 segundos antes de poder descargar tu código QR personalizado.</p>
+  <button id="descargarBtn" style="padding: 10px 20px; font-size: 16px;" disabled>
+    ⏳ Esperando...
   </button>
 
   <script>
-    document.getElementById("descargarBtn").addEventListener("click", function () {
-      const params = new URLSearchParams(window.location.search);
-      const enlace = params.get("url");
+    const button = document.getElementById("descargarBtn");
+    const params = new URLSearchParams(window.location.search);
+    const enlace = params.get("url");
 
-      if (!enlace) {
-        alert("❌ No se proporcionó ninguna URL.");
-        return;
+    if (!enlace) {
+      document.body.innerHTML = "<h3>❌ No se proporcionó ninguna URL.</h3>";
+      throw new Error("Sin URL");
+    }
+
+    // Esperar 15 segundos antes de activar el botón
+    let contador = 15;
+    const intervalo = setInterval(() => {
+      contador--;
+      button.innerText = `⏳ Espera ${contador}s...`;
+      if (contador <= 0) {
+        clearInterval(intervalo);
+        button.innerText = "⬇️ Descargar QR";
+        button.disabled = false;
       }
+    }, 1000);
 
+    button.addEventListener("click", () => {
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(enlace)}`;
 
       fetch(qrUrl)
