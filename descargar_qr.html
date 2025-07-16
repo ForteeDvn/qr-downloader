@@ -2,32 +2,33 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Descarga QR Dinámico</title>
+  <title>Descargar QR</title>
 </head>
-<body>
-  <p>🔄 Generando tu QR, un momento...</p>
+<body style="font-family: sans-serif; text-align: center; padding: 50px;">
+  <h2>📲 Descargar código QR</h2>
+  <p>Haz clic en el botón para descargar tu código QR personalizado.</p>
+  <button id="descargarBtn" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+    ⬇️ Descargar QR
+  </button>
+
   <script>
-    // Obtener parámetro "url" de la URL actual
-    const params = new URLSearchParams(window.location.search);
-    const enlaceOriginal = params.get("url");
+    document.getElementById("descargarBtn").addEventListener("click", function() {
+      const params = new URLSearchParams(window.location.search);
+      const enlace = params.get("url");
 
-    if (!enlaceOriginal) {
-      document.body.innerHTML = "<h3>❌ Error: No se proporcionó ninguna URL válida.</h3>";
-    } else {
-      // Construir URL del QR
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(enlaceOriginal)}`;
+      if (!enlace) {
+        alert("❌ No se proporcionó ninguna URL válida.");
+        return;
+      }
 
-      // Crear enlace <a> para descarga automática
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(enlace)}`;
       const link = document.createElement("a");
       link.href = qrUrl;
       link.download = "codigoQR.png";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      // También mostrar el QR por si falla la descarga automática
-      document.body.innerHTML += `<p>✅ Si no se descarga automáticamente, <a href="${qrUrl}" download="codigoQR.png">haz clic aquí</a>.</p>`;
-    }
+    });
   </script>
 </body>
 </html>
