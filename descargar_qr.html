@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Descarga QR Dinámico</title>
+</head>
+<body>
+  <p>🔄 Generando tu QR, un momento...</p>
+  <script>
+    // Obtener parámetro "url" de la URL actual
+    const params = new URLSearchParams(window.location.search);
+    const enlaceOriginal = params.get("url");
+
+    if (!enlaceOriginal) {
+      document.body.innerHTML = "<h3>❌ Error: No se proporcionó ninguna URL válida.</h3>";
+    } else {
+      // Construir URL del QR
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(enlaceOriginal)}`;
+
+      // Crear enlace <a> para descarga automática
+      const link = document.createElement("a");
+      link.href = qrUrl;
+      link.download = "codigoQR.png";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // También mostrar el QR por si falla la descarga automática
+      document.body.innerHTML += `<p>✅ Si no se descarga automáticamente, <a href="${qrUrl}" download="codigoQR.png">haz clic aquí</a>.</p>`;
+    }
+  </script>
+</body>
+</html>
